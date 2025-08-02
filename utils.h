@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "livros.h"
 
 #define LIVROS_BIN "livros.bin"
@@ -18,5 +19,8 @@ void formatarSistema();
 FILE *abrirArquivo();
 void lerStr(char *str, int size);
 void lerInt(int *i);
+
+//não feito 
+void carregarArquivo();
 
 #endif // __UTILS_H__

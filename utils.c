@@ -83,7 +83,6 @@ void criarBin(){
     header.posTop = 0;
     header.posFree = -1;
     header.totalLivros = 0;
-    header.totalExemplares = 0;
     escreverHeader(file, header);
     
     printf("Arquivo %s foi inicializado.\n", LIVROS_BIN);
@@ -112,6 +111,7 @@ void limparBuffer(){
 void formatarSistema(){
     printf("FORMATACAO DO SISTEMA\n\n");
     remove(LIVROS_BIN); 
+    while(!access(LIVROS_BIN, F_OK));
     printf("Arquivo %s foi excluido.\n", LIVROS_BIN);
     criarBin();
 }
@@ -125,6 +125,22 @@ FILE *abrirArquivo(){
     }
 
     return file;
+}
+
+void trim(char *str) {
+    char *inicio = str;
+    while (*inicio == ' ') inicio++;
+    char *fim = str + strlen(str) - 1;
+    while (fim > inicio && (*fim == ' ' || *fim == '\n')) {
+        *fim = '\0';
+        fim--;
+    }
+    if (inicio != str)
+        memmove(str, inicio, strlen(inicio) + 1);
+}
+
+void carregarArquivo(){
+    printf("CARREGAR ARQUVO");
 }
 
 void lerStr(char *str, int size){

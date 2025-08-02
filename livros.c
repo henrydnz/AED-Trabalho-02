@@ -40,8 +40,8 @@ void registrarLivro(const Livro novoLivro){
     }
 
     // caso 2 - arvore nao vazia
-    // procura o pai do livro a registrar
-    Livro livroAtual;
+    // procura pai do novo livro e o altera, escreve o novo livro
+    Livro livroAtual, livroPai;
     int posAtual = header.posHead;
     int posPai = -1;
     while(posAtual != -1){
@@ -51,13 +51,10 @@ void registrarLivro(const Livro novoLivro){
                     livroAtual.posDir : 
                     livroAtual.posEsq;
     }
-
-    //altera pai, escreve filho
-    Livro livroPai = lerLivro(file, posPai);
+    livroPai = lerLivro(file, posPai);
     (novoLivro.codigo > livroPai.codigo)?
         (livroPai.posDir = header.posTop):
         (livroPai.posEsq = header.posTop);
-
     escreverLivro(file, livroPai, posPai);
     escreverLivro(file, novoLivro, header.posTop);
 
@@ -77,8 +74,7 @@ void cadastrarLivro(){
     Livro novoLivro;
 
     printf("Codigo: ");
-    scanf("%d", &(novoLivro.codigo));
-    limparBuffer();
+    lerInt(&novoLivro.codigo);
 
     printf("Titulo: ");
     lerStr(novoLivro.titulo, MAX_TITULO);
@@ -198,12 +194,96 @@ void totalLivros(){
     fclose(file);
 }
 
-void removerLivro(){
-    printf("REMOVER LIVRO");
-}
+// helper functions pra removerLivro();
 
-void carregarArquivo(){
-    printf("CARREGAR ARQUVO");
+// int pesquisarPai(FILE *file, int codigo){
+//     BinHeader header = lerHeader(file);
+//     Livro livroAtual;
+//     int posAtual = header.posHead;
+//     int posPai = -1;
+//     while(posAtual != -1){
+//         livroAtual= lerLivro(file, posAtual);
+//         if(livroAtual.codigo == codigo)
+//             return posPai;
+//         posPai = posAtual;
+//         posAtual = (codigo > livroAtual.codigo)?
+//                     livroAtual.posDir:
+//                     livroAtual.posEsq;
+//     }
+//     return -1;  // nao chega aq
+// }
+
+// int pesquisarMenor(FILE *file, int posInicio){
+//     Livro livroAtual;
+//     int posAtual = posInicio;
+//     int posMM = posInicio;
+//     while(posAtual != -1) {
+//         posMM = posAtual;
+//         livroAtual = lerLivro(file, posMM);
+//         posAtual = livroAtual.posEsq;
+//     }
+//     return posMM;
+// }
+
+void removerLivro(){
+    // printf("REMOVER LIVRO\n\n");
+
+    // FILE *file = abrirArquivo();
+    // BinHeader header = lerHeader(file);
+
+    // if(header.posHead == -1){
+    //     printf("Não existem livros cadastrados!\n");
+    //     fclose(file);
+    //     return;
+    // }
+
+    // int codigo;
+    // printf("Digite o codigo para remover: ");
+    // lerInt(&codigo);
+
+    // int posRemocao = pesquisarCodigo(file, codigo);
+    // if(posRemocao == -1){
+    //     printf("Esse codigo nao existe!\n");
+    //     fclose(file);
+    //     return;
+    // }
+
+    // 
+    // Livro livroRemocao = lerLivro(file, posRemocao);
+
+    // if (livroRemocao.posDir != -1 && livroRemocao.posEsq != -1) {
+    //     int posSucessor = pesquisarMenor(file, livroRemocao.posDir);
+    //     Livro livroSucessor = lerLivro(file, posSucessor);
+    //     strcpy(livroRemocao.titulo, livroSucessor.titulo);
+    //     strcpy(livroRemocao.autor, livroSucessor.autor);
+    //     strcpy(livroRemocao.editora, livroSucessor.editora);
+    //     livroRemocao.ano = livroSucessor.ano;
+    //     livroRemocao.codigo = livroSucessor.codigo;
+    //     livroRemocao.edicao = livroSucessor.edicao;
+    //     livroRemocao.exemplares = livroSucessor.exemplares;
+    //     livroRemocao.preco = livroSucessor.preco;
+    //     escreverLivro(file, livroRemocao, posRemocao);
+    //     posRemocao = posSucessor;
+    // }
+
+    // int posFilhoUnico = (livroRemocao.posEsq != -1) ? livroRemocao.posEsq : livroRemocao.posDir;
+
+    // int posPai = pesquisarPai(file, livroRemocao.codigo);
+    // if(posPai != -1){
+    //     Livro livroPai = lerLivro(file, posPai);
+    //     if (livroPai.posDir == posRemocao)
+    //         livroPai.posDir = posFilhoUnico;
+    //     else 
+    //         livroPai.posEsq = posFilhoUnico;
+    //     escreverLivro(file, livroPai, posPai);
+    // }
+
+    // header.posFree = posRemocao;
+    // header.totalLivros--;
+    // escreverHeader(file, header);
+
+    // printf("Livro de codigo %d removido com sucesso.\n", codigo);
+    // fclose(file);
 }
 
 void listarRegistrosLivres(){
@@ -211,5 +291,24 @@ void listarRegistrosLivres(){
 }
 
 void imprimirArvore(){
-    printf("IMPRIMIR ARVORE POR NIVEIS");
+    printf("IMPRIMIR ARVORE POR NIVEIS\n\n");
+
+    FILE *file = abrirArquivo();
+    BinHeader header = lerHeader(file);
+    
+    int fila[header.totalLivros];
+    int cabeca = 0, cauda = 0;
+
+    fila[cauda++] = header.posHead;
+    while(cabeca < cauda){
+        int count = cauda - cabeca;
+        for(int i=0;i<count;++i){
+            int pos = fila[cabeca++];
+            Livro livro = lerLivro(file, pos);
+            printf("%d ", livro.codigo);
+            if(livro.posEsq != -1) fila[cauda++] = livro.posEsq;
+            if(livro.posDir != -1) fila[cauda++] = livro.posDir;
+        }
+        printf("\n");
+    }
 }
