@@ -33,6 +33,7 @@ void registrarLivro(const Livro novoLivro){
         header.posHead = header.posTop;
         escreverLivro(file, novoLivro, header.posTop);
         header.posTop++;
+        header.totalLivros++;
         escreverHeader(file, header);
         fclose(file);
         return;
@@ -89,16 +90,13 @@ void cadastrarLivro(){
     lerStr(novoLivro.editora, MAX_EDITORA);
 
     printf("Numero da edicao: ");
-    scanf("%d", &(novoLivro.edicao));
-    limparBuffer();
+    lerInt(&novoLivro.edicao);
 
     printf("Ano: ");
-    scanf("%d", &(novoLivro.ano));
-    limparBuffer();
+    lerInt(&novoLivro.ano);
 
     printf("Numero de exemplares: ");
-    scanf("%d", &(novoLivro.exemplares));
-    limparBuffer();
+    lerInt(&novoLivro.exemplares);
 
     printf("Preco: ");
     scanf("%lf", &(novoLivro.preco));
@@ -142,12 +140,12 @@ void imprimirDadosLivro(){
     printf("IMPRIMIR DADOS POR CODIGO\n\n");
 
     FILE *file = abrirArquivo();
-    int codigo, posCodigo;
-    printf("Digite o codigo do livro: ");
-    scanf("%d", &codigo);
-    limparBuffer();
 
-    posCodigo = pesquisarCodigo(file, codigo);
+    int codigo;
+    printf("Digite o codigo do livro: ");
+    lerInt(&codigo);
+
+    int posCodigo = pesquisarCodigo(file, codigo);
     if(posCodigo == -1) {
         printf("Esse codigo nao existe!\n");
         fclose(file);
@@ -160,9 +158,9 @@ void imprimirDadosLivro(){
 }
 
 void mostrarCompacto(Livro livro){
-    printf("--- \"%s\" de %s\n", livro.titulo, livro.autor);
+    printf("\n--- \"%s\" de %s\n", livro.titulo, livro.autor);
     printf("Codigo: %d\n", livro.codigo);
-    printf("Exemplares disp.: %d\n\n", livro.exemplares);
+    printf("Exemplares disp.: %d\n", livro.exemplares);
 }
 
 void mostrarInOrdem(FILE *file, int posicao){
@@ -190,7 +188,14 @@ void listarLivros(){
 }
 
 void totalLivros(){
-    printf("TOTAL DE LIVROS CADASTRADOS");
+    printf("TOTAL DE LIVROS CADASTRADOS\n\n");
+    
+    FILE *file = abrirArquivo();
+    BinHeader header = lerHeader(file);
+
+    printf("O total de livros cadastrados eh %d\n", header.totalLivros);
+
+    fclose(file);
 }
 
 void removerLivro(){

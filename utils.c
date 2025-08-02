@@ -67,37 +67,28 @@ void mostrarMenu(){
 }
 
 void criarBin(){
-    FILE *fileLivros = fopen(LIVROS_BIN, "rb");
-
-    // jah existe, retorna
-    if(fileLivros != NULL){
-        fclose(fileLivros);
-        return;
+    FILE *file = fopen(LIVROS_BIN, "rb");
+    if(file != NULL){
+        fclose(file); return;
     }
 
-    // nao existe, cria
-    fileLivros = fopen(LIVROS_BIN, "wb");
-
-    // erro ao criar
-    if(fileLivros == NULL){
-        printf("ERRO: Não foi possivel criar o arquivo binário %s.", LIVROS_BIN);
+    file = fopen(LIVROS_BIN, "wb");
+    if(file == NULL){
+        printf("ERRO: Não foi possivel criar %s\n", LIVROS_BIN);
         exit(1);
     }
 
-    
-    // iniciar header de arquivo binario
-    // cria
     BinHeader header;
     header.posHead = -1;
     header.posTop = 0;
     header.posFree = -1;
     header.totalLivros = 0;
-    // escreve
-    fwrite(&header, sizeof(BinHeader), 1, fileLivros);
+    header.totalExemplares = 0;
+    escreverHeader(file, header);
     
-    printf("Arquivo %s foi inicializado.", LIVROS_BIN);
+    printf("Arquivo %s foi inicializado.\n", LIVROS_BIN);
 
-    fclose(fileLivros);
+    fclose(file);
 }
 
 void refresh(){
@@ -120,9 +111,9 @@ void limparBuffer(){
 
 void formatarSistema(){
     printf("FORMATACAO DO SISTEMA\n\n");
-    printf("Excluindo e reinicializando arquivo...\n");
-    remove(LIVROS_BIN); criarBin();
-    printf("Sistema formatado com sucesso.\n");
+    remove(LIVROS_BIN); 
+    printf("Arquivo %s foi excluido.\n", LIVROS_BIN);
+    criarBin();
 }
 
 FILE *abrirArquivo(){
@@ -140,4 +131,9 @@ void lerStr(char *str, int size){
     fgets(str, size, stdin);
     char *newline = strchr(str, '\n');
     if(newline != NULL) *newline = '\0';
+}
+
+void lerInt(int *i){
+    scanf("%d", i);
+    limparBuffer();
 }

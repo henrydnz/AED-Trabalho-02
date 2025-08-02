@@ -17,5 +17,6 @@ void limparBuffer();
 void formatarSistema();
 FILE *abrirArquivo();
 void lerStr(char *str, int size);
+void lerInt(int *i);
 
 #endif // __UTILS_H__

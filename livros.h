@@ -12,6 +12,7 @@ typedef struct {
     int posTop;
     int posFree;
     int totalLivros;
+    int totalExemplares;
 } BinHeader;
 
 typedef struct {
@@ -27,18 +28,18 @@ typedef struct {
     double preco;
 } Livro;
 
-Livro lerLivro(FILE *file, const int posicao);
-BinHeader lerHeader(FILE *file);
-void escreverLivro(FILE *file, const Livro livro, const int posicao);
-void escreverHeader(FILE *file, const BinHeader header);
-void registrarLivro(const Livro novoLivro);
-void cadastrarLivro();
-int pesquisarCodigo(FILE *file, int codigo);
-void mostrarLivro(Livro livro);
-void imprimirDadosLivro();
-void mostrarCompacto(Livro livro);
-void mostrarInOrdem(FILE *file, int posicao);
-void listarLivros();
+Livro lerLivro(FILE *file, const int posicao);  //feito
+BinHeader lerHeader(FILE *file);    //feito
+void escreverLivro(FILE *file, const Livro livro, const int posicao);   //feito
+void escreverHeader(FILE *file, const BinHeader header);    //feito
+void registrarLivro(const Livro novoLivro); //feito
+void cadastrarLivro();  //feito
+int pesquisarCodigo(FILE *file, int codigo);    //feito
+void mostrarLivro(Livro livro); //feito
+void imprimirDadosLivro();  //feito
+void mostrarCompacto(Livro livro);  //feito
+void mostrarInOrdem(FILE *file, int posicao);   //feito
+void listarLivros();    //feito
 void totalLivros();
 void removerLivro();
 void carregarArquivo();
