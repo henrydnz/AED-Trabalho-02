@@ -1,7 +1,6 @@
 #include "utils.h"
 
 void menu(){
-    criarBin();
     int opcao = -1;
     while(opcao != 0){
         mostrarMenu();
@@ -68,36 +67,27 @@ void mostrarMenu(){
 }
 
 void criarBin(){
-    FILE *fileLivros = fopen(LIVROS_BIN, "rb");
-
-    // jah existe, retorna
-    if(fileLivros != NULL){
-        fclose(fileLivros);
-        return;
+    FILE *file = fopen(LIVROS_BIN, "rb");
+    if(file != NULL){
+        fclose(file); return;
     }
 
-    // nao existe, cria
-    fileLivros = fopen(LIVROS_BIN, "wb");
-
-    // erro ao criar
-    if(fileLivros == NULL){
-        printf("ERRO: Não foi possivel criar o arquivo binário %s.", LIVROS_BIN);
+    file = fopen(LIVROS_BIN, "wb");
+    if(file == NULL){
+        printf("ERRO: Não foi possivel criar %s\n", LIVROS_BIN);
         exit(1);
     }
 
-    fclose(fileLivros);
-
-    // iniciar header de arquivo binario
-    // cria
     BinHeader header;
     header.posHead = -1;
     header.posTop = 0;
     header.posFree = -1;
     header.totalLivros = 0;
-    // escreve
-    fwrite(&header, sizeof(BinHeader), 1, fileLivros);
+    escreverHeader(file, header);
     
-    printf("Arquivo %s foi inicializado.", LIVROS_BIN);
+    printf("Arquivo %s foi inicializado.\n", LIVROS_BIN);
+
+    fclose(file);
 }
 
 void refresh(){
@@ -109,7 +99,7 @@ void refresh(){
 }
 
 void pausa(){
-    printf("\nPressione Enter para retornar...");
+    printf("\n\nPressione Enter para retornar...");
     char c = getchar();
     if(c!='\n') limparBuffer();
 }
@@ -120,7 +110,46 @@ void limparBuffer(){
 
 void formatarSistema(){
     printf("FORMATACAO DO SISTEMA\n\n");
-    printf("Excluindo e reinicializando arquivo...\n");
-    remove(LIVROS_BIN); criarBin();
-    printf("Sistema formatado com sucesso.\n");
+    remove(LIVROS_BIN); 
+    while(!access(LIVROS_BIN, F_OK));
+    printf("Arquivo %s foi excluido.\n", LIVROS_BIN);
+    criarBin();
+}
+
+FILE *abrirArquivo(){
+    FILE *file = fopen(LIVROS_BIN, "r+b");
+
+    if (file == NULL) {
+        printf("Erro ao abrir %s\n", LIVROS_BIN);
+        exit(1);
+    }
+
+    return file;
+}
+
+void trim(char *str) {
+    char *inicio = str;
+    while (*inicio == ' ') inicio++;
+    char *fim = str + strlen(str) - 1;
+    while (fim > inicio && (*fim == ' ' || *fim == '\n')) {
+        *fim = '\0';
+        fim--;
+    }
+    if (inicio != str)
+        memmove(str, inicio, strlen(inicio) + 1);
+}
+
+void carregarArquivo(){
+    printf("CARREGAR ARQUVO");
+}
+
+void lerStr(char *str, int size){
+    fgets(str, size, stdin);
+    char *newline = strchr(str, '\n');
+    if(newline != NULL) *newline = '\0';
+}
+
+void lerInt(int *i){
+    scanf("%d", i);
+    limparBuffer();
 }
