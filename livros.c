@@ -1,71 +1,45 @@
 #include "livros.h"
 
-void registrarLivro(Livro novoLivro){
-    FILE *file = fopen(LIVROS_BIN, "rb");
-
-    if (file == NULL) {
-        printf("Erro ao abrir %s\n", LIVROS_BIN);
-        return;
-    }
-
-    BinHeader header;
-    fread(&header, sizeof(BinHeader), 1, file);
-
-    novoLivro.posDir = -1;
-    novoLivro.posEsq = -1;
+void registrarLivro(const Livro novoLivro){
+    FILE *file = abrirArquivo();
+    BinHeader header = lerHeader(file);
 
     // caso 1 - arvore vazia
-
     if(header.posHead == -1){
         header.posHead = header.posTop;
-        fseek(file, sizeof(BinHeader) + header.posTop * sizeof(Livro), SEEK_SET);
-        fwrite(&novoLivro, sizeof(Livro), 1, file);
+        escreverLivro(file, novoLivro, header.posTop);
         header.posTop++;
-        fseek(file, 0, SEEK_SET);
-        fwrite(&header, sizeof(BinHeader), 1, file);
+        escreverHeader(file, header);
         fclose(file);
         return;
     }
 
     // caso 2 - arvore nao vazia
-
     // procura o pai do livro a registrar
     Livro livroAtual;
     int posAtual = header.posHead;
     int posPai = -1;
     while(posAtual != -1){
-        // atualiza pai pra posicao atual
         posPai = posAtual;
-        // le livro atual
-        fseek(file, sizeof(BinHeader) + posAtual * sizeof(Livro), SEEK_SET);
-        fread(&livroAtual, sizeof(Livro), 1, file);
-        // atualiza posicao atual
-        posAtual = (novoLivro.codigo > livroAtual.codigo) ? livroAtual.posDir : livroAtual.posEsq;
+        livroAtual = lerLivro(file, posAtual);
+        posAtual = (novoLivro.codigo > livroAtual.codigo) ? 
+                    livroAtual.posDir : 
+                    livroAtual.posEsq;
     }
 
-    // le pai
-    Livro livroPai;
-    fseek(file, sizeof(BinHeader) + posPai * sizeof(Livro), SEEK_SET);
-    fread(&livroPai, sizeof(Livro), 1, file);
-    // atualiza ligacoes do pai
-    if(novoLivro.codigo > livroPai.codigo)
-        livroPai.posDir = header.posTop;
-    else 
-        livroPai.posEsq = header.posTop;
-    // reescreve pai
-    fseek(file, sizeof(BinHeader) + posPai * sizeof(Livro), SEEK_SET);
-    fwrite(&livroPai, sizeof(Livro), 1, file);
+    //altera pai, escreve filho
+    Livro livroPai = lerLivro(file, posPai);
+    (novoLivro.codigo > livroPai.codigo)?
+        (livroPai.posDir = header.posTop):
+        (livroPai.posEsq = header.posTop);
 
-    // escreve novo livro
-    fseek(file, sizeof(BinHeader) + header.posTop * sizeof(Livro), SEEK_SET);
-    fwrite(&novoLivro, sizeof(Livro), 1, file);
+    escreverLivro(file, livroPai, posPai);
+    escreverLivro(file, novoLivro, header.posTop);
 
-    //atualiza header.posTop
+    //altera header
     header.posTop++;
-    //reescreve header
-    fseek(file, 0, SEEK_SET);
-    fwrite(&header, sizeof(BinHeader), 1, file);
-    
+    escreverHeader(file, header);
+
     fclose(file);
 }
 
@@ -105,6 +79,9 @@ void cadastrarLivro(){
     printf("Preco: ");
     scanf("%lf", &(novoLivro.edicao));
     limparBuffer();
+
+    novoLivro.posDir = -1;
+    novoLivro.posEsq = -1;
 
     registrarLivro(novoLivro);
 }

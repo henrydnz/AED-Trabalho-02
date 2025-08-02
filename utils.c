@@ -96,7 +96,7 @@ void criarBin(){
     header.totalLivros = 0;
     // escreve
     fwrite(&header, sizeof(BinHeader), 1, fileLivros);
-    
+
     printf("Arquivo %s foi inicializado.", LIVROS_BIN);
 }
 
@@ -123,4 +123,39 @@ void formatarSistema(){
     printf("Excluindo e reinicializando arquivo...\n");
     remove(LIVROS_BIN); criarBin();
     printf("Sistema formatado com sucesso.\n");
+}
+
+Livro lerLivro(const FILE *file, const int posicao){
+    Livro livro;
+    fseek(file, sizeof(BinHeader) + posicao * sizeof(Livro), SEEK_SET);
+    fread(&livro, sizeof(Livro), 1, file);
+    return livro;
+}
+
+BinHeader lerHeader(const FILE *file){
+    BinHeader header;
+    fseek(file, 0, SEEK_SET);
+    fwrite(&header, sizeof(BinHeader), 1, file);
+    return header;
+}
+
+void escreverLivro(const FILE *file, const Livro livro, const int posicao){
+    fseek(file, sizeof(BinHeader) + posicao * sizeof(Livro), SEEK_SET);
+    fwrite(&livro, sizeof(Livro), 1, file);
+}
+
+void escreverHeader(const FILE *file, const BinHeader header){
+    fseek(file, 0, SEEK_SET);
+    fwrite(&header, sizeof(BinHeader), 1, file);
+}
+
+FILE *abrirArquivo(){
+    FILE *file = fopen(LIVROS_BIN, "rb");
+
+    if (file == NULL) {
+        printf("Erro ao abrir %s\n", LIVROS_BIN);
+        exit(1);
+    }
+
+    return file;
 }

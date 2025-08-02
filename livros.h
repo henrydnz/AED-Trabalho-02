@@ -27,7 +27,7 @@ typedef struct {
     double preco;
 } Livro;
 
-void registrarLivro(Livro novoLivro);
+void registrarLivro(const Livro novoLivro);
 void cadastrarLivro();
 void imprimirDadosLivro();
 void listarLivros();
