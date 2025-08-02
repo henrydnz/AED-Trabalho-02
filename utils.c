@@ -1,7 +1,6 @@
 #include "utils.h"
 
 void menu(){
-    criarBin();
     int opcao = -1;
     while(opcao != 0){
         mostrarMenu();
@@ -85,8 +84,7 @@ void criarBin(){
         exit(1);
     }
 
-    fclose(fileLivros);
-
+    
     // iniciar header de arquivo binario
     // cria
     BinHeader header;
@@ -96,8 +94,10 @@ void criarBin(){
     header.totalLivros = 0;
     // escreve
     fwrite(&header, sizeof(BinHeader), 1, fileLivros);
-
+    
     printf("Arquivo %s foi inicializado.", LIVROS_BIN);
+
+    fclose(fileLivros);
 }
 
 void refresh(){
@@ -109,7 +109,7 @@ void refresh(){
 }
 
 void pausa(){
-    printf("\nPressione Enter para retornar...");
+    printf("\n\nPressione Enter para retornar...");
     char c = getchar();
     if(c!='\n') limparBuffer();
 }
@@ -125,32 +125,8 @@ void formatarSistema(){
     printf("Sistema formatado com sucesso.\n");
 }
 
-Livro lerLivro(const FILE *file, const int posicao){
-    Livro livro;
-    fseek(file, sizeof(BinHeader) + posicao * sizeof(Livro), SEEK_SET);
-    fread(&livro, sizeof(Livro), 1, file);
-    return livro;
-}
-
-BinHeader lerHeader(const FILE *file){
-    BinHeader header;
-    fseek(file, 0, SEEK_SET);
-    fwrite(&header, sizeof(BinHeader), 1, file);
-    return header;
-}
-
-void escreverLivro(const FILE *file, const Livro livro, const int posicao){
-    fseek(file, sizeof(BinHeader) + posicao * sizeof(Livro), SEEK_SET);
-    fwrite(&livro, sizeof(Livro), 1, file);
-}
-
-void escreverHeader(const FILE *file, const BinHeader header){
-    fseek(file, 0, SEEK_SET);
-    fwrite(&header, sizeof(BinHeader), 1, file);
-}
-
 FILE *abrirArquivo(){
-    FILE *file = fopen(LIVROS_BIN, "rb");
+    FILE *file = fopen(LIVROS_BIN, "r+b");
 
     if (file == NULL) {
         printf("Erro ao abrir %s\n", LIVROS_BIN);
@@ -158,4 +134,10 @@ FILE *abrirArquivo(){
     }
 
     return file;
+}
+
+void lerStr(char *str, int size){
+    fgets(str, size, stdin);
+    char *newline = strchr(str, '\n');
+    if(newline != NULL) *newline = '\0';
 }

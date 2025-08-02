@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include "livros.h"
 
 #define LIVROS_BIN "livros.bin"
@@ -15,10 +15,7 @@ void refresh();
 void pausa();
 void limparBuffer();
 void formatarSistema();
-Livro lerLivro(const FILE *file, const int posicao);
-BinHeader lerHeader(const FILE *file);
-void escreverLivro(const FILE *file, const Livro livro, const int posicao);
-void escreverHeader(const FILE *file, const BinHeader header);
 FILE *abrirArquivo();
+void lerStr(char *str, int size);
 
 #endif // __UTILS_H__

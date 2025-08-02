@@ -27,8 +27,14 @@ typedef struct {
     double preco;
 } Livro;
 
+Livro lerLivro(FILE *file, const int posicao);
+BinHeader lerHeader(FILE *file);
+void escreverLivro(FILE *file, const Livro livro, const int posicao);
+void escreverHeader(FILE *file, const BinHeader header);
 void registrarLivro(const Livro novoLivro);
 void cadastrarLivro();
+int pesquisarCodigo(FILE *file, int codigo);
+void mostrarLivro(Livro livro);
 void imprimirDadosLivro();
 void listarLivros();
 void totalLivros();

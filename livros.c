@@ -1,5 +1,29 @@
 #include "livros.h"
 
+Livro lerLivro(FILE *file, const int posicao){
+    Livro livro;
+    fseek(file, sizeof(BinHeader) + posicao * sizeof(Livro), SEEK_SET);
+    fread(&livro, sizeof(Livro), 1, file);
+    return livro;
+}
+
+BinHeader lerHeader(FILE *file){
+    BinHeader header;
+    fseek(file, 0, SEEK_SET);
+    fread(&header, sizeof(BinHeader), 1, file);
+    return header;
+}
+
+void escreverLivro(FILE *file, const Livro livro, const int posicao){
+    fseek(file, sizeof(BinHeader) + posicao * sizeof(Livro), SEEK_SET);
+    fwrite(&livro, sizeof(Livro), 1, file);
+}
+
+void escreverHeader(FILE *file, const BinHeader header){
+    fseek(file, 0, SEEK_SET);
+    fwrite(&header, sizeof(BinHeader), 1, file);
+}
+
 void registrarLivro(const Livro novoLivro){
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);
@@ -38,9 +62,12 @@ void registrarLivro(const Livro novoLivro){
 
     //altera header
     header.posTop++;
+    header.totalLivros++;
     escreverHeader(file, header);
 
     fclose(file);
+
+    printf("\"%s\" foi registrado.", novoLivro.titulo);
 }
 
 void cadastrarLivro(){
@@ -53,16 +80,13 @@ void cadastrarLivro(){
     limparBuffer();
 
     printf("Titulo: ");
-    fgets(novoLivro.titulo, MAX_TITULO, stdin);
-    limparBuffer();
+    lerStr(novoLivro.titulo, MAX_TITULO);
 
     printf("Autor: ");
-    fgets(novoLivro.autor, MAX_AUTOR, stdin);
-    limparBuffer();
+    lerStr(novoLivro.autor, MAX_AUTOR);
 
     printf("Editora: ");
-    fgets(novoLivro.editora, MAX_EDITORA, stdin);
-    limparBuffer();
+    lerStr(novoLivro.editora, MAX_EDITORA);
 
     printf("Numero da edicao: ");
     scanf("%d", &(novoLivro.edicao));
@@ -77,7 +101,7 @@ void cadastrarLivro(){
     limparBuffer();
 
     printf("Preco: ");
-    scanf("%lf", &(novoLivro.edicao));
+    scanf("%lf", &(novoLivro.preco));
     limparBuffer();
 
     novoLivro.posDir = -1;
@@ -86,8 +110,53 @@ void cadastrarLivro(){
     registrarLivro(novoLivro);
 }
 
+int pesquisarCodigo(FILE *file, int codigo){
+    BinHeader header = lerHeader(file);
+    int posCod, posAtual = header.posHead;
+    Livro livroAtual;
+
+    while(posAtual != -1){
+        posCod = posAtual;
+        livroAtual = lerLivro(file, posAtual);
+        if(codigo > livroAtual.codigo)
+            posAtual = livroAtual.posDir;
+        if(codigo < livroAtual.codigo)
+            posAtual = livroAtual.posEsq;
+        if(codigo == livroAtual.codigo)
+            return posCod;
+    }
+
+    return -1;
+}
+
+void mostrarLivro(Livro livro){
+    printf("\n--- \"%s\", de %s ---\n", livro.titulo, livro.autor);
+    printf("Editora: %s\n", livro.editora);
+    printf("Edicao: %d\n", livro.edicao);
+    printf("ano: %d\n", livro.ano);
+    printf("Exemplares disp.: %d\n", livro.exemplares);
+    printf("Preco: %.2lf", livro.preco);
+}
+
 void imprimirDadosLivro(){
-    printf("IMPRIMIR DADOS POR CODIGO");
+    printf("IMPRIMIR DADOS POR CODIGO\n\n");
+
+    FILE *file = abrirArquivo();
+    int codigo, posCodigo;
+    printf("Digite o codigo do livro: ");
+    scanf("%d", &codigo);
+    limparBuffer();
+
+    posCodigo = pesquisarCodigo(file, codigo);
+    if(posCodigo == -1) {
+        printf("Esse codigo nao existe!\n");
+        fclose(file);
+        return;
+    }
+
+    Livro livro = lerLivro(file, posCodigo);
+    mostrarLivro(livro);
+    fclose(file);
 }
 
 void listarLivros(){
