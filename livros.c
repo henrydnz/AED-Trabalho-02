@@ -159,8 +159,34 @@ void imprimirDadosLivro(){
     fclose(file);
 }
 
+void mostrarCompacto(Livro livro){
+    printf("--- \"%s\" de %s\n", livro.titulo, livro.autor);
+    printf("Codigo: %d\n", livro.codigo);
+    printf("Exemplares disp.: %d\n\n", livro.exemplares);
+}
+
+void mostrarInOrdem(FILE *file, int posicao){
+    if(posicao == -1) return;
+
+    Livro livro = lerLivro(file, posicao);
+    mostrarInOrdem(file, livro.posEsq);
+    mostrarCompacto(livro);
+    mostrarInOrdem(file,livro.posDir);
+}
+
 void listarLivros(){
-    printf("LISTA DOS LIVROS CADASTRADOS");
+    printf("LISTA DOS LIVROS CADASTRADOS\n\n");
+
+    FILE *file = abrirArquivo();
+    BinHeader header = lerHeader(file);
+
+    if(header.posHead == -1){
+        printf("Nenhum livro cadastrado.\n");
+        return;
+    }
+
+    mostrarInOrdem(file, header.posHead);
+    fclose(file);
 }
 
 void totalLivros(){

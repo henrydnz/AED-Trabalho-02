@@ -36,6 +36,8 @@ void cadastrarLivro();
 int pesquisarCodigo(FILE *file, int codigo);
 void mostrarLivro(Livro livro);
 void imprimirDadosLivro();
+void mostrarCompacto(Livro livro);
+void mostrarInOrdem(FILE *file, int posicao);
 void listarLivros();
 void totalLivros();
 void removerLivro();
