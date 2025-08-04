@@ -28,6 +28,19 @@ void registrarLivro(const Livro novoLivro){
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);
 
+    int posNovo;
+
+    // Verifica posLivre e reutiliza
+    if(header.posFree != -1){
+        posNovo = header.posFree;
+        Livro livre = lerLivro(file, posNovo); // contém próximo da lista de livres em posEsq
+        header.posFree = livre.posEsq; // atualiza head da lista livre
+    } else {
+        // caso não exista posição livre, usa o topo
+        posNovo = header.posTop;
+        header.posTop++;
+    }
+
     // caso 1 - arvore vazia
     if(header.posHead == -1){
         header.posHead = header.posTop;
@@ -226,6 +239,95 @@ void totalLivros(){
 // }
 
 void removerLivro(){
+    printf("REMOVER LIVRO\n\n");
+
+    FILE *file = abrirArquivo();
+    BinHeader header = lerHeader(file);
+
+    if(header.posHead == -1){
+        printf("Nao existem livros cadastrados!\n");
+        fclose(file);
+        return;
+    }
+
+    int codigo;
+    printf("Digite o codigo para remover: ");
+    lerInt(&codigo);
+
+    int posRemocao = pesquisarCodigo(file, codigo);
+    if(posRemocao == -1){
+        printf("Esse codigo nao existe!\n");
+        fclose(file);
+        return;
+    }
+
+    int posPai = -1;
+    int posAtual = header.posHead;
+    Livro livroAtual;
+
+    // encontrar o pai
+    while(posAtual != -1 && posAtual != posRemocao){
+        livroAtual = lerLivro(file, posAtual);
+        posPai = posAtual;
+        if(codigo < livroAtual.codigo)
+            posAtual = livroAtual.posEsq;
+        else
+            posAtual = livroAtual.posDir;
+    }
+
+    Livro livroRemocao = lerLivro(file, posRemocao);
+
+    // CASO 1: dois filhos
+    if(livroRemocao.posEsq != -1 && livroRemocao.posDir != -1){
+        int posSucessor = livroRemocao.posDir;
+        int posSucessorPai = posRemocao;
+        Livro sucessor = lerLivro(file, posSucessor);
+
+        // buscar o menor da subárvore direita
+        while(sucessor.posEsq != -1){
+            posSucessorPai = posSucessor;
+            posSucessor = sucessor.posEsq;
+            sucessor = lerLivro(file, posSucessor);
+        }
+
+        // copia os dados do sucessor para o nó a ser removido
+        livroRemocao = sucessor;
+        escreverLivro(file, livroRemocao, posRemocao);
+
+        // agora o problema é reduzir para remoção do sucessor
+        posPai = posSucessorPai;
+        posRemocao = posSucessor;
+        livroRemocao = sucessor;
+    }
+
+    // CASO 2 e 3: zero ou um filho
+    int posFilho = (livroRemocao.posEsq != -1) ? livroRemocao.posEsq : livroRemocao.posDir;
+
+    if(posPai == -1){
+        // está removendo a raiz
+        header.posHead = posFilho;
+    } else {
+        Livro livroPai = lerLivro(file, posPai);
+        if(livroPai.posEsq == posRemocao)
+            livroPai.posEsq = posFilho;
+        else
+            livroPai.posDir = posFilho;
+        escreverLivro(file, livroPai, posPai);
+    }
+
+    // MARCAR COMO LIVRE: reutiliza campo posEsq para apontar para o próximo livre
+    livroRemocao.posEsq = header.posFree;
+    livroRemocao.posDir = -1; // opcional
+    livroRemocao.codigo = -1; // marca como inválido
+    escreverLivro(file, livroRemocao, posRemocao);
+
+    header.posFree = posRemocao;
+    header.totalLivros--;
+    escreverHeader(file, header);
+
+    printf("Livro de codigo %d removido com sucesso.\n", codigo);
+    fclose(file);
+
     // printf("REMOVER LIVRO\n\n");
 
     // FILE *file = abrirArquivo();
