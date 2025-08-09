@@ -83,32 +83,32 @@ void registrarLivro(Livro novoLivro){
 }
 
 void cadastrarLivro(){
-    printf("CADASTRAR LIVRO\n\n");
+    printf(">> Cadastrar Livro <<\n\n");
 
     Livro novoLivro;
 
-    printf("Codigo: ");
+    printf("- Codigo: ");
     lerInt(&novoLivro.codigo);
 
-    printf("Titulo: ");
+    printf("- Titulo (150): ");
     lerStr(novoLivro.titulo, MAX_TITULO);
 
-    printf("Autor: ");
+    printf("- Autor (200): ");
     lerStr(novoLivro.autor, MAX_AUTOR);
 
-    printf("Editora: ");
+    printf("- Editora (50): ");
     lerStr(novoLivro.editora, MAX_EDITORA);
 
-    printf("Numero da edicao: ");
+    printf("- Numero da edicao: ");
     lerInt(&novoLivro.edicao);
 
-    printf("Ano: ");
+    printf("- Ano: ");
     lerInt(&novoLivro.ano);
 
-    printf("Numero de exemplares: ");
+    printf("- Numero de exemplares: ");
     lerInt(&novoLivro.exemplares);
 
-    printf("Preco: ");
+    printf("- Preco: ");
     scanf("%lf", &(novoLivro.preco));
     limparBuffer();
 
@@ -135,17 +135,17 @@ int pesquisarCodigo(FILE *file, int codigo){
     return -1;
 }
 
-void mostrarLivro(Livro livro){
-    printf("\n--- \"%s\", de %s ---\n", livro.titulo, livro.autor);
-    printf("Editora: %s\n", livro.editora);
-    printf("Edicao: %d\n", livro.edicao);
-    printf("ano: %d\n", livro.ano);
-    printf("Exemplares disp.: %d\n", livro.exemplares);
-    printf("Preco: %.2lf", livro.preco);
+void mostrarLivro(Livro livro) {
+    printf("\n== CODIGO: [%d] ==\n", livro.codigo);
+    printf("Titulo:\n  > %s\n", livro.titulo);
+    printf("Autor:\n  > %s\n", livro.autor);
+    printf("Editora:\n  > %s\n", livro.editora);
+    printf("Edicao: %-4d | Ano: %-7d | Exemplares: %-4d | Preco: R$ %.2f\n", 
+            livro.edicao, livro.ano, livro.exemplares, livro.preco);
 }
 
 void imprimirDadosLivro(){
-    printf("IMPRIMIR DADOS POR CODIGO\n\n");
+    printf(">> Imprimir Dados por Codigo <<\n\n");
 
     FILE *file = abrirArquivo();
 
@@ -165,10 +165,24 @@ void imprimirDadosLivro(){
     fclose(file);
 }
 
-void mostrarCompacto(Livro livro){
-    printf("\n--- \"%s\" de %s\n", livro.titulo, livro.autor);
-    printf("Codigo: %d\n", livro.codigo);
-    printf("Exemplares disp.: %d\n", livro.exemplares);
+void mostrarCompacto(Livro livro) {
+    printf("--------------------------------------------------------------------\n");
+    printf("[%d] ", livro.codigo);
+    
+    // truncamento de titulo
+    const int LARGURA_MAX_TITULO = 55;
+    if (strlen(livro.titulo) > LARGURA_MAX_TITULO)
+        printf("\"%.*s...\"\n", LARGURA_MAX_TITULO - 3, livro.titulo);
+    else
+        printf("\"%s\"\n", livro.titulo);
+    
+    // truncamento de autor
+    const int LARGURA_MAX_AUTOR = 40;
+    printf("      -> Autor: %.*s%s | Exemplares: %d\n", 
+            LARGURA_MAX_AUTOR, 
+            livro.autor,
+            (strlen(livro.autor) > LARGURA_MAX_AUTOR) ? "..." : "", //truncamento
+            livro.exemplares);
 }
 
 void mostrarInOrdem(FILE *file, int posicao){
@@ -181,7 +195,7 @@ void mostrarInOrdem(FILE *file, int posicao){
 }
 
 void listarLivros(){
-    printf("LISTA DOS LIVROS CADASTRADOS\n\n");
+    printf(">> Lista de Livros Cadastrados <<\n\n");
 
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);
@@ -196,7 +210,7 @@ void listarLivros(){
 }
 
 void totalLivros(){
-    printf("TOTAL DE LIVROS CADASTRADOS\n\n");
+    printf("Total de Livros Cadastrados\n\n");
     
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);
@@ -218,7 +232,7 @@ void copiarLivro(Livro *dest, Livro source){
 }
 
 void removerLivro(){
-    printf("REMOVER LIVRO\n\n");
+    printf(">> Remover Livro <<\n\n");
 
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);
@@ -260,7 +274,7 @@ void removerLivro(){
             livroRemocao.posDir = sucessor.posDir;
         
         Livro paiSucessor = lerLivro(file, sucessor.posPai);
-        
+
         // se o pai do sucessor é o livro a remover
         if (paiSucessor.pos != posRemocao){
             paiSucessor.posEsq = sucessor.posDir;
@@ -316,7 +330,7 @@ void removerLivro(){
 }
 
 void listarRegistrosLivres(){
-    printf("LISTA DE REGISTROS LIVRES\n\n");
+    printf(">> Lista de Registros Livres <<\n\n");
 
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);
@@ -328,20 +342,21 @@ void listarRegistrosLivres(){
 
     int posAtual = header.posFree;
 
-    printf("Posicoes de registros livres: ");
+    printf("Posicoes de registros livres:\n");
+    printf("INICIO -> ");
     while(posAtual != -1){
         printf("%d", posAtual);
         Livro livroAtual = lerLivro(file, posAtual);
-        if(livroAtual.posEsq != -1) printf(", ");
+        if(livroAtual.posEsq != -1) printf(" -> ");
         posAtual = livroAtual.posEsq;
     }
-    printf("\n");
+    printf(" -> FIM\n");
 
     fclose(file);
 }
 
 void imprimirArvore(){
-    printf("IMPRIMIR ARVORE POR NIVEIS\n\n");
+    printf(">> Imprimir Arvore por Niveis <<\n\n");
 
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);

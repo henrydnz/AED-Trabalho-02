@@ -38,7 +38,6 @@ void menu(){
             case 0:
                 printf("Saindo do sistema. Ate logo!\n\n");
                 continue;
-            case 123: debug(); break;
             default: 
                 printf("Opcao nao reconhecida\n\n");
                 break;
