@@ -17,6 +17,8 @@ typedef struct {
 typedef struct {
     int posEsq;
     int posDir;
+    int posPai;
+    int pos;
     int codigo;
     char titulo[MAX_TITULO];
     char autor[MAX_AUTOR];
@@ -27,52 +29,20 @@ typedef struct {
     double preco;
 } Livro;
 
-//feito
 Livro lerLivro(FILE *file, const int posicao);
-
-//feito
 BinHeader lerHeader(FILE *file);
-
-//feito
-void escreverLivro(FILE *file, const Livro livro, const int posicao);
-
-//feito
-void escreverHeader(FILE *file, const BinHeader header);
-
-//feito
-void registrarLivro(const Livro novoLivro);
-
-//feito
-void cadastrarLivro();
-
-//feito
+void escreverLivro(FILE *file, const Livro livro);
+void registrarLivro(Livro novoLivro);
 int pesquisarCodigo(FILE *file, int codigo);
-
-//feito
 void mostrarLivro(Livro livro); 
-
-//feito
 void imprimirDadosLivro(); 
-
-//feito
 void mostrarCompacto(Livro livro);
-
-//feito
 void mostrarInOrdem(FILE *file, int posicao); 
-
-//feito
 void listarLivros();
-
-//feito
 void totalLivros();
-
-//difícil, não feito - depende da resposta do professor
+void copiarLivro(Livro *dest, Livro source);
 void removerLivro();
-
-//difícil, não feito - depende do removerLivro();
 void listarRegistrosLivres();
-
-//feito
 void imprimirArvore();
 
 #endif // __LIVROS_H__
