@@ -55,13 +55,13 @@ void mostrarMenu(){
     printf("-----------------------------------------------\n");
     printf(" Selecione uma opcao:\n\n");
     printf(" %-2d - Cadastrar livro\n", 1);
-    printf(" %-2d - Imprimir dados do livro por codigo\n", 2);
-    printf(" %-2d - Listar todos os livros\n", 3);
-    printf(" %-2d - Mostrar total de livros\n", 4);
+    printf(" %-2d - Pesquisar por codigo\n", 2);
+    printf(" %-2d - Listar livros\n", 3);
+    printf(" %-2d - Imprimir total\n", 4);
     printf(" %-2d - Remover livro\n", 5);
     printf(" %-2d - Carregar arquivo\n", 6);
     printf(" %-2d - Listar registros livres\n", 7);
-    printf(" %-2d - Imprimir arvores por niveis\n", 8);
+    printf(" %-2d - Imprimir arvore por niveis\n", 8);
     printf(" %-2d - Formatar sistema\n\n", 9);
     printf(" %-2d - Sair\n", 0);
     printf("-----------------------------------------------\n");

@@ -79,7 +79,7 @@ void registrarLivro(Livro novoLivro){
 
     fclose(file);
 
-    printf("\"%s\" foi registrado.", novoLivro.titulo);
+    printf("> \"%s\" registrado com sucesso.\n", novoLivro.titulo);
 }
 
 void cadastrarLivro(){
@@ -136,16 +136,15 @@ int pesquisarCodigo(FILE *file, int codigo){
 }
 
 void mostrarLivro(Livro livro) {
-    printf("\n== CODIGO: [%d] ==\n", livro.codigo);
-    printf("Titulo:\n  > %s\n", livro.titulo);
+    printf("\nTitulo:\n  > %s\n", livro.titulo);
     printf("Autor:\n  > %s\n", livro.autor);
-    printf("Editora:\n  > %s\n", livro.editora);
+    printf("Editora:\n  > %s\n\n", livro.editora);
     printf("Edicao: %-4d | Ano: %-7d | Exemplares: %-4d | Preco: R$ %.2f\n", 
             livro.edicao, livro.ano, livro.exemplares, livro.preco);
 }
 
 void imprimirDadosLivro(){
-    printf(">> Imprimir Dados por Codigo <<\n\n");
+    printf(">> Pesquisar por Codigo <<\n\n");
 
     FILE *file = abrirArquivo();
 
@@ -210,7 +209,7 @@ void listarLivros(){
 }
 
 void totalLivros(){
-    printf("Total de Livros Cadastrados\n\n");
+    printf(">> Total de Livros Cadastrados <<\n\n");
     
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);
