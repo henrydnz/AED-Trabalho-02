@@ -109,7 +109,7 @@ void limparBuffer(){
 }
 
 void formatarSistema(){
-    printf("FORMATACAO DO SISTEMA\n\n");
+    printf(">> Formatacao do Sistema <<\n\n");
     remove(LIVROS_BIN); 
     while(!access(LIVROS_BIN, F_OK));
     printf("Arquivo %s foi excluido.\n", LIVROS_BIN);
@@ -140,7 +140,13 @@ void trim(char *str) {
 }
 
 void carregarArquivo(){
-    printf("CARREGAR ARQUVO");
+    printf(">> Carregar Arquivo <<");
+
+    char nomeArq[15];
+    printf("Digite o nome do arquivo:\n");
+    lerStr(nomeArq, 15);
+
+    
 }
 
 void lerStr(char *str, int size){
