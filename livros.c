@@ -1,5 +1,10 @@
 #include "livros.h"
 
+/// @brief Lê um livro no arquivo binário em uma posição.
+/// @param file
+/// @param posicao 
+/// @return Uma cópia do struct Livro lido.
+/// @pre Ponteiro deve apontar para arquivo. Livro deve existir na posição.
 Livro lerLivro(FILE *file, const int posicao){
     Livro livro;
     fseek(file, sizeof(BinHeader) + posicao * sizeof(Livro), SEEK_SET);
@@ -7,6 +12,10 @@ Livro lerLivro(FILE *file, const int posicao){
     return livro;
 }
 
+/// @brief Lê a header do arquivo binário.
+/// @param file - Ponteiro para o arquivo
+/// @return Uma cópia do struct BinHeader lido.
+/// @pre Ponteiro deve apontar para arquivo. Header deve existir.
 BinHeader lerHeader(FILE *file){
     BinHeader header;
     fseek(file, 0, SEEK_SET);
@@ -14,16 +23,30 @@ BinHeader lerHeader(FILE *file){
     return header;
 }
 
+/// @brief Escreve um livro no arquivo binário
+/// @param file 
+/// @param livro 
+/// @pre Ponteiro deve apontar para arquivo
+/// @post Arquivo é alterado com a informação do livro escrito.
 void escreverLivro(FILE *file, const Livro livro){
     fseek(file, sizeof(BinHeader) + livro.pos * sizeof(Livro), SEEK_SET);
     fwrite(&livro, sizeof(Livro), 1, file);
 }
 
+/// @brief Escreve/reescreve header no arquivo binário.
+/// @param file 
+/// @param header 
+/// @pre Ponteiro deve apontar para arquivo
+/// @post Arquivo é alterado com a informação da header escrita.
 void escreverHeader(FILE *file, const BinHeader header){
     fseek(file, 0, SEEK_SET);
     fwrite(&header, sizeof(BinHeader), 1, file);
 }
 
+/// @brief Lógica para registrar um livro no arquivo binário 
+///        como uma árvore binária de busca.
+/// @param novoLivro 
+/// @pre Arquivo deve existir. 
 void registrarLivro(Livro novoLivro){
     FILE *file = abrirArquivo();
     BinHeader header = lerHeader(file);
@@ -82,6 +105,9 @@ void registrarLivro(Livro novoLivro){
     printf("> \"%s\" registrado com sucesso.\n", novoLivro.titulo);
 }
 
+/// @brief Perguntas para o cadastro de um novo livro no sistema.
+/// @post Um struct Livro é montado com as informações e enviado para a função de
+///       registro de livros.
 void cadastrarLivro(){
     printf(">> Cadastrar Livro <<\n\n");
 
@@ -115,6 +141,13 @@ void cadastrarLivro(){
     registrarLivro(novoLivro);
 }
 
+/// @brief Pesquisa a posição de um livro com um certo código na árvore binária.
+/// @param file 
+/// @param codigo 
+/// @return Inteiro representando a posição do livro com o código dado.
+///         Caso não encontre, ou existam dois livros de mesmo código, 
+///         então retorna -1.
+/// @pre Ponteiro deve apontar para arquivo.
 int pesquisarCodigo(FILE *file, int codigo){
     BinHeader header = lerHeader(file);
     int posAtual = header.posHead;
@@ -135,6 +168,9 @@ int pesquisarCodigo(FILE *file, int codigo){
     return -1;
 }
 
+/// @brief Estrutura para mostragem de informações de um livro.
+/// @param livro 
+/// @post Imprime na tela as informações do livro.
 void mostrarLivro(Livro livro) {
     printf("\nTitulo:\n  > %s\n", livro.titulo);
     printf("Autor:\n  > %s\n", livro.autor);
@@ -143,6 +179,8 @@ void mostrarLivro(Livro livro) {
             livro.edicao, livro.ano, livro.exemplares, livro.preco);
 }
 
+/// @brief Pede um código, pesquisa e mostra informações sobre o livro respectivo.
+/// @post Imprime na tela as informações do livro ou avisa caso ele não exista.
 void imprimirDadosLivro(){
     printf(">> Pesquisar por Codigo <<\n\n");
 
@@ -164,6 +202,9 @@ void imprimirDadosLivro(){
     fclose(file);
 }
 
+/// @brief Estrutura para mostragem de informaçõe de um livro compacta.
+///        Usada para mostragem da lista de livros cadastrados.
+/// @param livro 
 void mostrarCompacto(Livro livro) {
     printf("--------------------------------------------------------------------\n");
     printf("[%d] ", livro.codigo);
@@ -184,6 +225,10 @@ void mostrarCompacto(Livro livro) {
             livro.exemplares);
 }
 
+/// @brief Função recursiva ajudante para a função de listar os livros do sistema.
+/// @param file 
+/// @param posicao 
+/// @pre Ponteiro deve apontar para arquivo.
 void mostrarInOrdem(FILE *file, int posicao){
     if(posicao == -1) return;
 
@@ -193,6 +238,7 @@ void mostrarInOrdem(FILE *file, int posicao){
     mostrarInOrdem(file,livro.posDir);
 }
 
+/// @brief Mostra a lista de todos os livros cadastrados no sistema em ordem crescente de código.
 void listarLivros(){
     printf(">> Lista de Livros Cadastrados <<\n\n");
 
@@ -208,6 +254,7 @@ void listarLivros(){
     fclose(file);
 }
 
+/// @brief Imprime na tela um inteiro representando o total de livros cadastrados no sistema.
 void totalLivros(){
     printf(">> Total de Livros Cadastrados <<\n\n");
     
@@ -219,6 +266,11 @@ void totalLivros(){
     fclose(file);
 }
 
+/// @brief Função helper para copiar as características de um livro para outro.
+///        Ponteiros não são copiados.
+/// @param dest 
+/// @param source 
+/// @post O livro destino recebe as informações do livro source, exceto os ponteiros.
 void copiarLivro(Livro *dest, Livro source){
     dest->ano = source.ano;
     strncpy(dest->autor, source.autor, sizeof(dest->autor)-1);
@@ -230,6 +282,10 @@ void copiarLivro(Livro *dest, Livro source){
     dest->exemplares = source.exemplares;
 }
 
+/// @brief Pede um código de livro ao usuário e depois performa a exclusão do livro do sistema,
+///        mantendo a lógica da árvore binária intacta.
+/// @post O livro com o código respectivo será removido e a árvore binária será reestruturada
+///       mantendo sua lógica.
 void removerLivro(){
     printf(">> Remover Livro <<\n\n");
 
@@ -328,6 +384,7 @@ void removerLivro(){
     printf("Livro de codigo %d removido com sucesso.\n", codigo);
 }
 
+/// @brief Imprime uma lista de registros livres em forma de uma lista encadeada.
 void listarRegistrosLivres(){
     printf(">> Lista de Registros Livres <<\n\n");
 
@@ -354,6 +411,7 @@ void listarRegistrosLivres(){
     fclose(file);
 }
 
+/// @brief Imprime na tela uma representação minimalista da estrutura atual da árvore binária.
 void imprimirArvore(){
     printf(">> Imprimir Arvore por Niveis <<\n\n");
 

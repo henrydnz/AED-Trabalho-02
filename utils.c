@@ -2,6 +2,7 @@
 
 #define MAX_ARQ_NAME 100
 
+/// @brief 
 void menu(){
     int opcao = -1;
     while(opcao != 0){
@@ -48,6 +49,7 @@ void menu(){
     }
 }
 
+/// @brief 
 void mostrarMenu(){
     refresh();
     printf("-----------------------------------------------\n");
@@ -68,6 +70,7 @@ void mostrarMenu(){
     printf("\n> ");
 }
 
+/// @brief 
 void refresh(){
     #if defined(_WIN32) || defined(_WIN64) 
         system("cls");  // comando windows
@@ -76,27 +79,36 @@ void refresh(){
     #endif
 }
 
+/// @brief 
 void pausa(){
     printf("\n\nPressione Enter para retornar...");
     char c = getchar();
     if(c!='\n') limparBuffer();
 }
 
+/// @brief 
 void limparBuffer(){
     for(int c; (c = getchar()) != '\n' && c != EOF; );
 }
 
+/// @brief 
+/// @param str 
+/// @param size 
 void lerStr(char *str, const int size){
     fgets(str, size, stdin);
     char *newline = strchr(str, '\n');
     if(newline != NULL) *newline = '\0';
 }
 
+/// @brief 
+/// @param i 
 void lerInt(int *i){
     scanf("%d", i);
     limparBuffer();
 }
 
+/// @brief 
+/// @return 
 FILE *abrirArquivo(){
     FILE *file = fopen(LIVROS_BIN, "r+b");
 
@@ -108,6 +120,7 @@ FILE *abrirArquivo(){
     return file;
 }
 
+/// @brief 
 void criarBin(){
     FILE *file = fopen(LIVROS_BIN, "rb");
     if(file != NULL){
@@ -132,6 +145,8 @@ void criarBin(){
     fclose(file);
 }
 
+/// @brief 
+/// @param str 
 void trim(char *str) {
     char *inicio = str;
     while (*inicio == ' ') inicio++;
@@ -144,6 +159,7 @@ void trim(char *str) {
         memmove(str, inicio, strlen(inicio) + 1);
 }
 
+/// @brief 
 void carregarArquivo(){
 
     printf(">> Carregar Arquivo <<");
@@ -210,6 +226,7 @@ void carregarArquivo(){
     fclose(file_txt);
 }
 
+/// @brief 
 void formatarSistema(){
     printf(">> Formatacao do Sistema <<\n\n");
     remove(LIVROS_BIN); 
