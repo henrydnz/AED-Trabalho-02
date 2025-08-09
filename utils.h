@@ -11,16 +11,15 @@
 
 void menu();
 void mostrarMenu();
-void criarBin();
 void refresh();
 void pausa();
 void limparBuffer();
-void formatarSistema();
-FILE *abrirArquivo();
-void lerStr(char *str, int size);
+void lerStr(char *str, const int size);
 void lerInt(int *i);
-
-//não feito 
+FILE *abrirArquivo();
+void criarBin();
+void trim(char *str);
 void carregarArquivo();
+void formatarSistema();
 
 #endif // __UTILS_H__

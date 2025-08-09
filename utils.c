@@ -68,6 +68,46 @@ void mostrarMenu(){
     printf("\n> ");
 }
 
+void refresh(){
+    #if defined(_WIN32) || defined(_WIN64) 
+        system("cls");  // comando windows
+    #elif defined(__linux__) || defined(__APPLE__)
+        system("clear"); // comando linux ou macos
+    #endif
+}
+
+void pausa(){
+    printf("\n\nPressione Enter para retornar...");
+    char c = getchar();
+    if(c!='\n') limparBuffer();
+}
+
+void limparBuffer(){
+    for(int c; (c = getchar()) != '\n' && c != EOF; );
+}
+
+void lerStr(char *str, const int size){
+    fgets(str, size, stdin);
+    char *newline = strchr(str, '\n');
+    if(newline != NULL) *newline = '\0';
+}
+
+void lerInt(int *i){
+    scanf("%d", i);
+    limparBuffer();
+}
+
+FILE *abrirArquivo(){
+    FILE *file = fopen(LIVROS_BIN, "r+b");
+
+    if (file == NULL) {
+        printf("Erro ao abrir %s\n", LIVROS_BIN);
+        exit(1);
+    }
+
+    return file;
+}
+
 void criarBin(){
     FILE *file = fopen(LIVROS_BIN, "rb");
     if(file != NULL){
@@ -92,43 +132,6 @@ void criarBin(){
     fclose(file);
 }
 
-void refresh(){
-    #if defined(_WIN32) || defined(_WIN64) 
-        system("cls");  // comando windows
-    #elif defined(__linux__) || defined(__APPLE__)
-        system("clear"); // comando linux ou macos
-    #endif
-}
-
-void pausa(){
-    printf("\n\nPressione Enter para retornar...");
-    char c = getchar();
-    if(c!='\n') limparBuffer();
-}
-
-void limparBuffer(){
-    for(int c; (c = getchar()) != '\n' && c != EOF; );
-}
-
-void formatarSistema(){
-    printf(">> Formatacao do Sistema <<\n\n");
-    remove(LIVROS_BIN); 
-    while(!access(LIVROS_BIN, F_OK));
-    printf("Arquivo %s foi excluido.\n", LIVROS_BIN);
-    criarBin();
-}
-
-FILE *abrirArquivo(){
-    FILE *file = fopen(LIVROS_BIN, "r+b");
-
-    if (file == NULL) {
-        printf("Erro ao abrir %s\n", LIVROS_BIN);
-        exit(1);
-    }
-
-    return file;
-}
-
 void trim(char *str) {
     char *inicio = str;
     while (*inicio == ' ') inicio++;
@@ -142,6 +145,7 @@ void trim(char *str) {
 }
 
 void carregarArquivo(){
+
     printf(">> Carregar Arquivo <<");
 
     char nomeArq[MAX_ARQ_NAME];
@@ -206,13 +210,10 @@ void carregarArquivo(){
     fclose(file_txt);
 }
 
-void lerStr(char *str, int size){
-    fgets(str, size, stdin);
-    char *newline = strchr(str, '\n');
-    if(newline != NULL) *newline = '\0';
-}
-
-void lerInt(int *i){
-    scanf("%d", i);
-    limparBuffer();
+void formatarSistema(){
+    printf(">> Formatacao do Sistema <<\n\n");
+    remove(LIVROS_BIN); 
+    while(!access(LIVROS_BIN, F_OK));
+    printf("Arquivo %s foi excluido.\n", LIVROS_BIN);
+    criarBin();
 }
