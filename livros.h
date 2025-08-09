@@ -32,7 +32,9 @@ typedef struct {
 Livro lerLivro(FILE *file, const int posicao);
 BinHeader lerHeader(FILE *file);
 void escreverLivro(FILE *file, const Livro livro);
+void escreverHeader(FILE *file, const BinHeader header);
 void registrarLivro(Livro novoLivro);
+void cadastrarLivro();
 int pesquisarCodigo(FILE *file, int codigo);
 void mostrarLivro(Livro livro); 
 void imprimirDadosLivro(); 
