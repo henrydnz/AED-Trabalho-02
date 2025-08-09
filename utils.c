@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#define MAX_ARQ_NAME 100
+
 void menu(){
     int opcao = -1;
     while(opcao != 0){
@@ -142,11 +144,66 @@ void trim(char *str) {
 void carregarArquivo(){
     printf(">> Carregar Arquivo <<");
 
-    char nomeArq[15];
+    char nomeArq[MAX_ARQ_NAME];
     printf("Digite o nome do arquivo:\n");
-    lerStr(nomeArq, 15);
+    lerStr(nomeArq, MAX_ARQ_NAME);
 
+    FILE *file_txt = fopen(nomeArq, "r");
+    if(file_txt == NULL){
+        printf("O arquivo \"%s\" nao foi encontrado.\n", nomeArq);
+        printf("Verifique se o nome digitado está correto\n");
+        printf("ou se o arquivo está na pasta correta.");
+        return;
+    }
+
+    const char *delim = ";";
+    char linha[1024];
+    // matriz de char pra token
+    char tokens[8][MAX_AUTOR];  // max autor é o maior tamanho de token
+    Livro l;
     
+    while(fgets(linha, sizeof(linha), file_txt) != NULL){
+        // tira \n do final
+        linha[strcspn(linha, "\n")] = '\0';
+
+        // loop pra preencher tokens da linha
+        int tokenCount = 0;
+        char *token = strtok(linha, delim);
+        while(token != NULL && tokenCount < 8){
+            trim(token);
+            strncpy(tokens[tokenCount], token, MAX_AUTOR - 1);
+            tokens[tokenCount][MAX_AUTOR - 1] = '\0';
+            tokenCount++;
+            token = strtok(NULL, delim);
+        }
+
+        // montar livro
+        l.codigo = atoi(tokens[0]);
+
+        strncpy(l.titulo, tokens[1], MAX_TITULO);
+        l.titulo[MAX_TITULO-1] = '\0';
+
+        strncpy(l.autor, tokens[2], MAX_AUTOR);
+        l.autor[MAX_AUTOR-1] = '\0';
+
+        strncpy(l.editora, tokens[3], MAX_EDITORA);
+        l.editora[MAX_EDITORA] = '\0';
+
+        l.edicao = atoi(tokens[4]);
+
+        l.ano = atoi(tokens[5]);
+
+        l.exemplares = atoi(tokens[6]);
+
+        size_t pos = strcspn(tokens[7], ",");
+        if (tokens[7][pos] != '\0')
+            tokens[7][pos] = '.';
+        l.preco = atof(tokens[7]);
+
+        // salvar
+        registrarLivro(l);
+    }
+    fclose(file_txt);
 }
 
 void lerStr(char *str, int size){
