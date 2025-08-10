@@ -2,7 +2,8 @@
 
 #define MAX_ARQ_NAME 100
 
-/// @brief 
+/// @brief Loop de seleção de opções do Menu Principal do programa.
+/// @pre Arquivo binário precisa estar inicializado.
 void menu(){
     int opcao = -1;
     while(opcao != 0){
@@ -49,28 +50,20 @@ void menu(){
     }
 }
 
-/// @brief 
-void mostrarMenu(){
+/// @brief Estrutura de mostragem do menu principal com as opções.
+/// @post O terminal é limpo e o menu principal é impresso. 
+void mostrarMenu() {
     refresh();
-    printf("-----------------------------------------------\n");
-    printf("          SISTEMA BIBLIOTECA - Menu         \n");
-    printf("-----------------------------------------------\n");
-    printf(" Selecione uma opcao:\n\n");
-    printf(" %-2d - Cadastrar livro\n", 1);
-    printf(" %-2d - Pesquisar por codigo\n", 2);
-    printf(" %-2d - Listar livros\n", 3);
-    printf(" %-2d - Imprimir total\n", 4);
-    printf(" %-2d - Remover livro\n", 5);
-    printf(" %-2d - Carregar arquivo\n", 6);
-    printf(" %-2d - Listar registros livres\n", 7);
-    printf(" %-2d - Imprimir arvore por niveis\n", 8);
-    printf(" %-2d - Formatar sistema\n\n", 9);
-    printf(" %-2d - Sair\n", 0);
-    printf("-----------------------------------------------\n");
-    printf("\n> ");
+    printf("\n");
+    printf("---------------------------> Sistema Biblioteca <---------------------------\n");
+    printf("[1] Cadastrar | [2] Pesquisar | [3] Listar | [4] Total    | [5] Remover\n");
+    printf("[6] Arquivo   | [7] Livres    | [8] Arvore | [9] Formatar | [0] Sair\n");
+    printf("----------------------------------------------------------------------------\n");
+    printf("> ");
 }
 
-/// @brief 
+/// @brief Limpa o terminal quando chamada, usando o comando correto para diferentes OS.
+/// @post O terminal é limpo e o cursor volta ao início.
 void refresh(){
     #if defined(_WIN32) || defined(_WIN64) 
         system("cls");  // comando windows
@@ -79,36 +72,42 @@ void refresh(){
     #endif
 }
 
-/// @brief 
+/// @brief Quando chamada, imprime um aviso e aguarda o usuário digitar Enter.
+///        Retorna quando lê uma quebra de linha no stdin, resumindo o programa. 
 void pausa(){
-    printf("\n\nPressione Enter para retornar...");
+    printf("\n----------\nPressione Enter para retornar...");
     char c = getchar();
     if(c!='\n') limparBuffer();
 }
 
-/// @brief 
+/// @brief Limpa totalmente o buffer de entrada do stdin. 
+/// @post Qualquer conteúdo no buffer é apagado. 
 void limparBuffer(){
     for(int c; (c = getchar()) != '\n' && c != EOF; );
 }
 
-/// @brief 
+/// @brief Função helper para a leitura rápida de uma string.
 /// @param str 
 /// @param size 
+/// @post O parâmetro string passado é modificado com a leitura feita pela entrada do usuário.
 void lerStr(char *str, const int size){
     fgets(str, size, stdin);
     char *newline = strchr(str, '\n');
     if(newline != NULL) *newline = '\0';
 }
 
-/// @brief 
+/// @brief Função helper para a leitura rápida de um inteiro.
 /// @param i 
+/// @post O parâmetro inteiro passado é modificado com a lietura feita pela entrada do usuário.
+///       Após isso, o buffer é limpo.
 void lerInt(int *i){
     scanf("%d", i);
     limparBuffer();
 }
 
-/// @brief 
-/// @return 
+/// @brief Abre o arquivo binário já inicializado pelo sistema. Aborta se não encontrar
+/// @return Um ponteiro para o arquivo binário aberto.
+/// @pre O arquivo binário deve ter sido criado.
 FILE *abrirArquivo(){
     FILE *file = fopen(LIVROS_BIN, "r+b");
 
@@ -120,7 +119,8 @@ FILE *abrirArquivo(){
     return file;
 }
 
-/// @brief 
+/// @brief Cria o arquivo binário livros.bin para utilização do sistema. 
+/// @post O arquivo livros.bin é criado na mesma pasta que o source do programa.
 void criarBin(){
     FILE *file = fopen(LIVROS_BIN, "rb");
     if(file != NULL){
@@ -145,8 +145,10 @@ void criarBin(){
     fclose(file);
 }
 
-/// @brief 
+/// @brief Remove os espaços contidos antes e depios da string passada como parâmetro.
 /// @param str 
+/// @pre Pointer deve ser não nulo.
+/// @post Modifica a string passada, removendo os espaços antes e depois. 
 void trim(char *str) {
     char *inicio = str;
     while (*inicio == ' ') inicio++;
@@ -159,14 +161,17 @@ void trim(char *str) {
         memmove(str, inicio, strlen(inicio) + 1);
 }
 
-/// @brief 
+/// @brief Pergunta o nome do arquivo para a leitura, e logo após adiciona os livros descritos.
+/// @pre O arquivo .txt deve existir, e a sintática deve estar correta.
+/// @post Todos os livros descritos no sistema são adicionados ao arquivo binário.
 void carregarArquivo(){
 
-    printf(">> Carregar Arquivo <<");
+    printf(">> Carregar Arquivo <<\n\n");
 
     char nomeArq[MAX_ARQ_NAME];
     printf("Digite o nome do arquivo:\n");
     lerStr(nomeArq, MAX_ARQ_NAME);
+    printf("\n");
 
     FILE *file_txt = fopen(nomeArq, "r");
     if(file_txt == NULL){
@@ -226,7 +231,9 @@ void carregarArquivo(){
     fclose(file_txt);
 }
 
-/// @brief 
+/// @brief Reinicia totalmente o arquivo binário, perdendo todos os registros.
+/// @pre O arquivo binário deve existir. 
+/// @post O arquivo binário é excluído e logo após reinicializado novamente.
 void formatarSistema(){
     printf(">> Formatacao do Sistema <<\n\n");
     remove(LIVROS_BIN); 
